@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../logo.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
       
 
@@ -1260,6 +1260,8 @@
       
         
       
+        
+      
     
     
     
@@ -1348,6 +1350,34 @@
     
   
     Solutions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial2026/standardflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analysis flow
   
 
     
@@ -2219,7 +2249,7 @@ If the HESSE status is not 0 or the covariance matrix quality indicates it had t
 <div class="highlight"><pre><span></span><code>combine -M MultiDimFit datacard.txt --algo grid --points 100 --rMin -2 --rMax 6
 </code></pre></div>
 <p>The results can then be plotted using the <code>plot1Dscan.py</code> script, using the file <code>higgsCombineTest.MultiDimFit.mH120.root</code> which was output by the scan:</p>
-<div class="highlight"><pre><span></span><code>python3 ../../../scripts/plot1DScan.py --POI r higgsCombineTest.MultiDimFit.mH120.root
+<div class="highlight"><pre><span></span><code>plot1DScan.py --POI r higgsCombineTest.MultiDimFit.mH120.root
 </code></pre></div>
 <p>it should produce an output pdf and png files which look like the one shown below.
 You can see the best fit values, as well as the crossing points for the <span class="arithmatex">\(1\sigma\)</span> and <span class="arithmatex">\(2\sigma\)</span> intervals.</p>
@@ -2270,6 +2300,9 @@ This is done for you in the script <code>get_quantile.py</code>, which you can r
 </code></pre></div>
 <p>Test out a few values of <code>r</code> and see if they all give you the same result. 
 What happens for <code>r</code> less than about -1? Can you explain why? (hint: look at the values in the datacard)</p>
+<p><strong>Note</strong>: if you are running the toys generation and fitting commands separately, remember to always set the range to include the value you are setting. If you don't, Roofit will clip the value of <code>r</code> to the nearest boundary, and you could see unexpected results.</p>
+<p><strong>Advanced</strong>: if you run the command above for a set of points in the range [-2, 6] (the same one used in the scan before), you can build the line of critical values for <span class="arithmatex">\(t_{\mu}\)</span> and check where the crossing of the observed likelihood scan is in order to find the confidence interval. Try to do that and compare it to the one we derived earlier using Wilks' theorem.
+If you need help, take a look at the code in <code>plot_scan_with_quantile_solution.py</code>.</p>
 <h2 id="significance-testing">Significance Testing</h2>
 <p>For significance testing, we want to test the compatibility of our model with the background-only hypothesis <span class="arithmatex">\(\mu = 0\)</span>.
 However, when performing significance testing we are typically only interested in rejecting the null hypothesis if the confidence level is very high (e.g. <span class="arithmatex">\(5\sigma\)</span>).
@@ -2282,7 +2315,7 @@ This method is run using the asymptotic approximation, which relies on Wilks' th
 Under this approximation the significance is directly related to our test statistic, <span class="arithmatex">\(q_0\)</span> by: Significance = <span class="arithmatex">\(\sqrt{q_0}\)</span>.
 So for positive values of <span class="arithmatex">\(\hat{r}\)</span> we can read the Significance from the likelihood scan, by checking the value at the origin.</p>
 <div class="highlight"><pre><span></span><code>combine -M MultiDimFit datacard.txt --algo grid --points 100 --rMin -0.1 --rMax 1
-python3 ../../../scripts/plot1DScan.py --POI r higgsCombineTest.MultiDimFit.mH120.root --y-max 0.5
+plot1DScan.py --POI r higgsCombineTest.MultiDimFit.mH120.root --y-max 0.5
 </code></pre></div>
 <p>This will produce the same likelihood scan as before, but where we've restricted the range to be able to see the value of the curve at <code>r</code> = 0 more clearly.
 As expected, the crossing happens at around <span class="arithmatex">\(0.24^2\)</span></p>
@@ -2308,7 +2341,7 @@ This is not what is typically done for setting limits, but lets try to set some 
 <p>Under the asymptotic approximation, then, we can read off the values which we would reject from our earlier likelihood scan, they are all the values above about 4.</p>
 <p>Let's see what happens if we were to have observed 12 events instead of 6. There is a modified datacard <code>datacard_obs12.txt</code> with this already set for you.</p>
 <div class="highlight"><pre><span></span><code>combine -M MultiDimFit datacard_obs12.txt --algo grid --points 100 --rMin -2 --rMax 8
-python3 ../../../scripts/plot1DScan.py --POI r higgsCombineTest.MultiDimFit.mH120.root
+plot1DScan.py --POI r higgsCombineTest.MultiDimFit.mH120.root
 </code></pre></div>
 <p><img alt="" src="../llhood_scan_obs12.png" /></p>
 <p>In this case we would reject values of <code>r</code> above about 6.7, but also values of <code>r</code> below about 0.3 at the 95% CL.
@@ -2378,10 +2411,12 @@ Repeating this many times, we could find the value of <code>r</code> at which th
 <div class="highlight"><pre><span></span><code>combine -M HybridNew --LHCmode LHC-limits --plot r_scan.png datacard.txt
 </code></pre></div>
 <p><img alt="" src="../r_scan.png" /></p>
+<p>Questions:</p>
 <ul>
 <li>Where do the uncertainties on the CLs value at each value of <code>r</code> come from in the plot?</li>
 <li>How could the precision of the limit be increased?</li>
 </ul>
+<p>(hint: read through <a href="../../part3/commonstatsmethods/#computing-limits-with-toys">this section</a> and look for the adaptive sampling procedure)</p>
 <h3 id="debugging">Debugging</h3>
 <p>If you see some strange or unexpected behaviour in your limits, you can look at the distributions of the test static, or the various CLs values computed in order to better understand where the problem might be coming from.</p>
 <p>One situation you might encounter is observing the discrete nature or the counts when you are in the low statistics regime.</p>
@@ -2488,10 +2523,10 @@ In such cases, some of the quantiles of the expected limits may be very compress
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "navigation.footer", "navigation.indexes", "navigation.expand", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "search.highlight", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "navigation.footer", "navigation.indexes", "navigation.expand", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "search.highlight", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       
